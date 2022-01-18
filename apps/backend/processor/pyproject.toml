@@ -7,6 +7,8 @@ authors = ["Anurag Jha <toanuragjha@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 faust = "^1.10.4"
+uuid = "^1.30"
+opencv-contrib-python = "^4.5.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
