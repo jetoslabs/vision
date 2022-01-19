@@ -1,4 +1,5 @@
-from processor.app import app, channel1, topic
+from processor.app import app, channel1, processor_input_topic
+from processor.images.agents_helper import Transformer
 from processor.images.models import MyModel, Timing
 
 
@@ -8,7 +9,7 @@ async def agent1(stream):
         print(f"agent1 received: {str(event)}")
 
 
-@app.agent(channel=topic, sink=[channel1])
+@app.agent(channel=processor_input_topic, sink=[channel1])
 async def agent0(stream):
     event: MyModel
     async for event in stream:
@@ -23,10 +24,17 @@ async def agent_b(stream):
         print(f'AGENT B RECEIVED: {event!r}')
 
 
-@app.agent(channel=topic, sink=[agent_b])
+@app.agent(channel=processor_input_topic, sink=[agent_b])
 async def agent_a(stream):
     async for event in stream:
         timing: Timing
         print(f'AGENT A RECEIVED: {event!r}')
         yield event
 
+
+# @app.agent(channel=processor_input_topic)
+# async def agent_transformer_color_BGR2GRAY(stream):
+#     async for event in stream:
+#         frame = await Transformer.transformer_color_BGR2GRAY(event.data)
+#         print(f'AGENT A RECEIVED: {frame!r}')
+#         yield frame

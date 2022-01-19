@@ -1,16 +1,17 @@
 import faust
 from faust import TopicT
 
+from processor.core.config import settings
 from processor.images.models import Image
 
 app: faust.App = faust.App(
-    'vision_processor',
+    settings.ID,
     version=1,
     autodiscover=True,
     origin='processor'
 )
 
-topic: TopicT = app.topic('processor_input', value_type=Image)
+processor_input_topic: TopicT = app.topic(settings.PROCESSOR_INPUT_TOPIC, value_type=Image)
 channel1 = app.channel(value_type=Image)
 
 
