@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from processor.app import app, processor_input_topic
+from processor.app import app
+from processor.core.config import settings
 from processor.core.logs import generate_trace_id
 from processor.images.commands_helper import video_capture
 from processor.images.models import Image, Timing
@@ -16,7 +17,7 @@ async def populate():
         )],
         data=b'303'
     )
-    await processor_input_topic.send(value=image)
+    await app.send(channel=settings.PROCESSOR_INPUT_TOPIC, value=image)
 
 # @app.timer(5.0)
 # async def capture_frame():
@@ -28,4 +29,4 @@ async def populate():
 #         )],
 #         data=video_capture()
 #     )
-#     await processor_input_topic.send(value=image)
+#     await app.send(channel=settings.PROCESSOR_INPUT_TOPIC, value=image)

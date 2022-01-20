@@ -3,6 +3,9 @@ from typing import Optional, List
 
 import faust
 
+from processor.images.workflow import Workflow
+
+
 class MyModel(faust.Record):
     def __abstract_init__(self) -> None:
         pass
@@ -24,12 +27,11 @@ class Timing(faust.Record):
     time_taken_msec: Optional[float]
 
 
-class Image(faust.Record):
+class ProcessorInput(faust.Record):
     def __abstract_init__(self) -> None:
         pass
 
-    trace_id: str
-    timings: List[Timing]
+    workflow: Optional[Workflow]
     data: Optional[bytes]
 
 

@@ -1,35 +1,50 @@
-from processor.app import app, channel1, processor_input_topic
+from loguru import logger
+
+from processor.app import app
+from processor.core.config import settings
+from processor.images.agents_helper import get_agent_input_channel_name
 from processor.images.agents_helper import Transformer
 from processor.images.models import MyModel, Timing
 
 
-@app.agent(channel=channel1)
+# This agent derives input channel from settings file, a it is interface to the world
+@app.agent(channel=settings.PROCESSOR_INPUT_TOPIC)
+async def agent_gateway(stream):
+    async for event in stream:
+        try:
+            print(f"agent_gateway received: {str(event)}")
+        except Exception as e:
+            logger.bind().error(f"error: {e}")
+
+
+@app.agent(channel=get_agent_input_channel_name("agent1"))
 async def agent1(stream):
     async for event in stream:
         print(f"agent1 received: {str(event)}")
 
 
-@app.agent(channel=processor_input_topic, sink=[channel1])
-async def agent0(stream):
-    event: MyModel
-    async for event in stream:
-        print(f"agent0 received: {str(event)}")
-        yield event
-        # await app.send(channel=channel1, value=MyModel1(event.x))
+# @app.agent(channel=processor_input_topic)
+# async def agent0(stream):
+#     event: MyModel
+#     async for event in stream:
+#         print(f"agent0 received: {str(event)}")
+#         # yield event
+#         await app.send(channel=get_agent_input_channel_name("agent1"), value=event)
 
 
-@app.agent()
+@app.agent(channel=get_agent_input_channel_name("agent_b"))
 async def agent_b(stream):
     async for event in stream:
         print(f'AGENT B RECEIVED: {event!r}')
 
 
-@app.agent(channel=processor_input_topic, sink=[agent_b])
-async def agent_a(stream):
-    async for event in stream:
-        timing: Timing
-        print(f'AGENT A RECEIVED: {event!r}')
-        yield event
+# @app.agent(channel=processor_input_topic)
+# async def agent_a(stream):
+#     async for event in stream:
+#         timing: Timing
+#         print(f'AGENT A RECEIVED: {event!r}')
+#         # yield event
+#         await app.send(channel=get_agent_input_channel_name("agent_b"), value=event)
 
 
 # @app.agent(channel=processor_input_topic)
