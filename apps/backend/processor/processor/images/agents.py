@@ -7,12 +7,13 @@ from processor.images.agents_helper import Transformer
 from processor.images.models import MyModel, Timing
 
 
-# This agent derives input channel from settings file, a it is interface to the world
+# This agent derives input channel from settings file, as it is the interface to the world
 @app.agent(channel=settings.PROCESSOR_INPUT_TOPIC)
 async def agent_gateway(stream):
     async for event in stream:
         try:
             print(f"agent_gateway received: {str(event)}")
+            # TODO: write code to send to next agent in workflow, OR read docs for class layout of Agent (to send msg)
         except Exception as e:
             logger.bind().error(f"error: {e}")
 

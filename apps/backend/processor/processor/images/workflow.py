@@ -52,7 +52,7 @@ class Workflow(faust.Record):
 
 class WorkflowFactory:
     @staticmethod
-    def create_workflow(agent_names: List[str]) -> Workflow:
+    def create_workflow(agent_names: List[str] = []) -> Workflow:
         """Factory method to create a Workflow"""
         # Every data's journey begins with agent_gateway
         agent_configs: List[AgentConfig] = [WorkflowFactory.create_agent_gateway_config()]

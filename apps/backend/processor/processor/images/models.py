@@ -28,6 +28,12 @@ class Timing(faust.Record):
 
 
 class ProcessorInput(faust.Record):
+    """
+    Input to processor (agent_gateway)
+    Params:
+        workflow: Optional[Workflow]
+        data: Optional[bytes]
+    """
     def __abstract_init__(self) -> None:
         pass
 
