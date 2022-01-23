@@ -2,9 +2,10 @@ from typing import Any, Optional
 
 import cv2 as cv
 from loguru import logger
+from numpy import ndarray
 
 
-def video_capture(src: int = 0) -> Optional[Any]:
+def video_capture(src: int = 0) -> Optional[ndarray]:
     cap: cv.VideoCapture = cv.VideoCapture(src)
     try:
         ret, frame = cap.read()

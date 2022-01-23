@@ -1,5 +1,3 @@
-from typing import Optional
-
 import cv2 as cv
 
 
@@ -15,13 +13,6 @@ class Transformer:
         resulting_frame = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
         return resulting_frame
 
-
-def get_agent_input_channel_name(agent_name: str) -> Optional[str]:
-    if agent_name == "":
-        return None
-    return _eval_agent_input_channel_name(agent_name)
-
-
-def _eval_agent_input_channel_name(agent_name: str) -> str:
-    input_channel_name = f"{agent_name.lower()}-input-ch"
-    return input_channel_name
+# def release_current_and_send_to_next_in_workflow(workflow: Workflow, msg: Any) -> bool:
+#     next_agent_config = workflow.acquire_next_agent_config()
+#     workflow.release_agent_config()

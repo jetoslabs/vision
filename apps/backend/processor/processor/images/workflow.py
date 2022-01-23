@@ -1,9 +1,12 @@
+import uuid
 from typing import List, Any
 
 import faust
+from loguru import logger
+from uuid import UUID
 
 from processor.core.config import settings
-from processor.images.agents_helper import get_agent_input_channel_name
+from processor.images.agents_topic import get_agent_input_channel_name
 
 
 class AgentConfig(faust.Record):
@@ -29,6 +32,7 @@ class Workflow(faust.Record):
     def __abstract_init__(self) -> None:
         pass
 
+    id: UUID
     flows: List[AgentConfig]
 
     def acquire_next_agent_config(self) -> AgentConfig:
@@ -37,17 +41,18 @@ class Workflow(faust.Record):
             if not flow.is_done:
                 return flow
 
-    def release_agent_config(self, pos_in_flow: int = 1) -> bool:
-        """Agent use this method mark that work is complete"""
-        if pos_in_flow < 1 or pos_in_flow > len(self.flows):
-            return False
-        index_in_flow = pos_in_flow - 1
+    def release_agent_config(self, agent_name: str) -> bool:
+        """Agent use this method to mark that work is complete"""
         for i in range(len(self.flows)):
             flow = self.flows[i]
-            if not flow.is_done:
-                if i == index_in_flow:
-                    break
-        self.flows[index_in_flow].is_done = True
+            if flow.is_done:
+                continue
+            elif not flow.is_done and agent_name == flow.agent_name:
+                self.flows[i].is_done = True
+                logger.bind().debug(f"Releasing agent config: {agent_name} in workflow: {self.id}")
+                return True
+        logger.bind().info(f"Unable to release agent config: {agent_name} in workflow: {self.id}")
+        return False
 
 
 class WorkflowFactory:
@@ -56,12 +61,16 @@ class WorkflowFactory:
         """Factory method to create a Workflow"""
         # Every data's journey begins with agent_gateway
         agent_configs: List[AgentConfig] = [WorkflowFactory.create_agent_gateway_config()]
-
+        # User specified agents
         for agent_name in agent_names:
             agent_config = WorkflowFactory.create_agent_config(agent_name)
             agent_configs.append(agent_config)
+        # Journey ends on save or screen
 
-        workflow = Workflow(flows=agent_configs)
+        workflow = Workflow(
+            id=uuid.uuid4(),
+            flows=agent_configs
+        )
         return workflow
 
     @staticmethod

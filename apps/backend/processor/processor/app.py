@@ -1,5 +1,4 @@
 import faust
-from faust import TopicT
 
 from processor.core.config import settings
 from processor.images.models import ProcessorInput

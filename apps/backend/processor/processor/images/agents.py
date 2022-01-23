@@ -2,26 +2,48 @@ from loguru import logger
 
 from processor.app import app
 from processor.core.config import settings
-from processor.images.agents_helper import get_agent_input_channel_name
-from processor.images.agents_helper import Transformer
-from processor.images.models import MyModel, Timing
+
+from processor.images.agents_topic import get_agent_input_channel_name
+
+from processor.images.models import ProcessorInput
+
+# Agent names (is equal to method name of the agent)
+AGENT_GATEWAY = "agent_gateway"
+AGENT1 = "agent1"
+AGENT_B = "agent_b"
+AGENT_C = "agent_c"
+AGENT_SAVE_TO_DISK = "agent_save_to_disk"
 
 
 # This agent derives input channel from settings file, as it is the interface to the world
 @app.agent(channel=settings.PROCESSOR_INPUT_TOPIC)
 async def agent_gateway(stream):
     async for event in stream:
-        try:
-            print(f"agent_gateway received: {str(event)}")
-            # TODO: write code to send to next agent in workflow, OR read docs for class layout of Agent (to send msg)
-        except Exception as e:
-            logger.bind().error(f"error: {e}")
+        if isinstance(event, ProcessorInput):
+            # logger.bind().error(type(event.data))
+            try:
+                # TODO: write code to send to next agent in workflow, OR read docs for class layout of Agent (to send msg)
+                marked_is_done = event.workflow.release_agent_config(AGENT_GATEWAY)
+
+                next_agent_config = event.workflow.acquire_next_agent_config()
+                logger.bind().info(f"agent_gateway processed data with workflow: {str(event.workflow)}")
+                if next_agent_config:
+                    await app.send(channel=next_agent_config.agent_input_channel, value=event)
+            except Exception as e:
+                logger.bind().error(f"error: {e}")
 
 
 @app.agent(channel=get_agent_input_channel_name("agent1"))
 async def agent1(stream):
     async for event in stream:
-        print(f"agent1 received: {str(event)}")
+        try:
+            event.workflow.release_agent_config(AGENT1)
+            next_agent_config = event.workflow.acquire_next_agent_config()
+            logger.bind().info(f"agent1 processed data with workflow: {str(event.workflow)}")
+            if next_agent_config:
+                await app.send(channel=next_agent_config.agent_input_channel, value=event)
+        except Exception as e:
+            logger.bind().error(f"error: {e}")
 
 
 # @app.agent(channel=processor_input_topic)
@@ -36,7 +58,14 @@ async def agent1(stream):
 @app.agent(channel=get_agent_input_channel_name("agent_b"))
 async def agent_b(stream):
     async for event in stream:
-        print(f'AGENT B RECEIVED: {event!r}')
+        try:
+            event.workflow.release_agent_config(AGENT_B)
+            next_agent_config = event.workflow.acquire_next_agent_config()
+            logger.bind().info(f"agent_b processed data with workflow: {str(event.workflow)}")
+            if next_agent_config:
+                await app.send(channel=next_agent_config.agent_input_channel, value=event)
+        except Exception as e:
+            logger.bind().error(f"error: {e}")
 
 
 # @app.agent(channel=processor_input_topic)
@@ -54,3 +83,26 @@ async def agent_b(stream):
 #         frame = await Transformer.transformer_color_BGR2GRAY(event.data)
 #         print(f'AGENT A RECEIVED: {frame!r}')
 #         yield frame
+
+#
+# @app.agent(channel=get_agent_input_channel_name("agent_save_to_disk"))
+# async def agent_save_to_disk(stream):
+#     async for event in stream:
+#         logger.bind().info(f"agent_save_to_disk processed data with workflow: {str(event.workflow)}")
+#         try:
+#             event.workflow.release_agent_config(AGENT_SAVE_TO_DISK)
+#             next_agent_config = event.workflow.acquire_next_agent_config()
+#             if next_agent_config:
+#                 await app.send(channel=next_agent_config.agent_input_channel, value=event)
+#         except Exception as e:
+#             logger.bind().error(f"error: {e}")
+
+
+# async def release_and_send():
+#     try:
+#         event.workflow.release_agent_config(AGENT_SAVE_TO_DISK)
+#         next_agent_config = event.workflow.acquire_next_agent_config()
+#         if next_agent_config:
+#             await app.send(channel=next_agent_config.agent_input_channel, value=event)
+#     except Exception as e:
+#         logger.bind().error(f"error: {e}")
