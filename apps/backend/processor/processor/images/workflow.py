@@ -6,7 +6,7 @@ from loguru import logger
 from uuid import UUID
 
 from processor.core.config import settings
-from processor.images.agents_topic import get_agent_input_channel_name
+from processor.images.agents_helper import AgentTopic
 
 
 class AgentConfig(faust.Record):
@@ -78,7 +78,7 @@ class WorkflowFactory:
         """Factory method to create an AgentConfig"""
         agent_config = AgentConfig(
             agent_name=agent_name,
-            agent_input_channel=get_agent_input_channel_name(agent_name),
+            agent_input_channel=AgentTopic.get_agent_input_channel_name(agent_name),
             is_done=False
         )
         return agent_config
