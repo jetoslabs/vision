@@ -24,7 +24,7 @@ async def capture_frame():
     frame = video_capture()
     resized_frame = cv.resize(frame, (176, 144))
     processor_input = ProcessorInput(
-        workflow=WorkflowFactory.create_workflow(["agent1", "agent_b"]),
+        workflow=WorkflowFactory.create_workflow(["agent1", "agent_b", "agent_save_to_disk"]),
         data=resized_frame.tolist()
     )
     await app.send(channel=settings.PROCESSOR_INPUT_TOPIC, value=processor_input)
