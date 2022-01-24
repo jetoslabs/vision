@@ -1,6 +1,6 @@
 import pytest
 
-from processor.core.logs import generate_trace_id
+from processor.core.log import generate_trace_id
 
 
 # @pytest.mark.asyncio

@@ -2,6 +2,7 @@ import datetime
 from typing import Optional, List
 
 import faust
+from uuid import UUID
 
 from processor.images.workflow import Workflow
 
@@ -31,12 +32,14 @@ class ProcessorInput(faust.Record):
     """
     Input to processor (agent_gateway)
     Params:
+        id: Optional[UUID]
         workflow: Optional[Workflow]
         data: Optional[bytes]
     """
     def __abstract_init__(self) -> None:
         pass
 
+    id: Optional[UUID]
     workflow: Optional[Workflow]
     data: Optional[bytes]
 

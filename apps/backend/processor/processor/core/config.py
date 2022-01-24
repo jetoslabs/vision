@@ -4,7 +4,9 @@ from pydantic import BaseSettings
 class Config(BaseSettings):
     NAME: str = "Vision Processor"
     ID: str = "vision-processor"
-    APP_DEBUG = True
+    # Logger
+    LOG_SERIALIZE = False
+    LOG_LEVEL: str = "DEBUG"
 
     # Topics
     PROCESSOR_INPUT_TOPIC = "processor_input_topic"
