@@ -65,7 +65,6 @@ class WorkflowFactory:
         for agent_name in agent_names:
             agent_config = WorkflowFactory.create_agent_config(agent_name)
             agent_configs.append(agent_config)
-        # Journey ends on save or screen
 
         workflow = Workflow(
             id=uuid.uuid4(),

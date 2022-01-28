@@ -10,6 +10,7 @@ class AgentNames:
     AGENT_B = "agent_b"
     AGENT_C = "agent_c"
     AGENT_SAVE_TO_DISK = "agent_save_to_disk"
+    AGENT_TRANSFORMER_COLOR_BGR2GRAY = "agent_transformer_color_bgr2gray"
 
 
 class AgentTopic:

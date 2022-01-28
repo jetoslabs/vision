@@ -15,4 +15,5 @@ channel1 = app.channel(value_type=ProcessorInput)
 
 
 if __name__ == '__main__':
+    print("Starting app...")
     app.main()

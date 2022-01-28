@@ -41,7 +41,7 @@ class ProcessorInput(faust.Record):
 
     id: Optional[UUID]
     workflow: Optional[Workflow]
-    data: Optional[bytes]
+    data: Optional[list]
 
 
 # class Workflow(faust.Record):
